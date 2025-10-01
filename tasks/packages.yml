@@ -1,11 +1,7 @@
-- hosts: localhost
-  connection: local
-  become: true
-  tasks:
-  - name: Install packages
-    apt:
-      name:
-        - cmatrix
-        - neofetch
-        - ranger
-        - nmap
+- name: Install packages
+  apt:
+    name:
+      - cmatrix
+      - neofetch
+      - ranger
+      - nmap

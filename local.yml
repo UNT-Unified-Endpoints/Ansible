@@ -2,7 +2,12 @@
   connection: local
   become: true
   tasks:
-  - name: Install cmatrix
+  - name: Install packages
     apt:
-      name: cmatrix
+      name:
+        - cmatrix
+        - neofetch
+        - ranger
+      
+
 

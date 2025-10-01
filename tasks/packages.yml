@@ -5,3 +5,4 @@
       - neofetch
       - ranger
       - nmap
+    state: present

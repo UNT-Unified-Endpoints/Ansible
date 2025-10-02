@@ -1,19 +1,28 @@
 - hosts: localhost
   connection: local
   become: true
-  
+  gather_facts: yes
+
   pre_tasks:
-  - name: Update repo
-    apt:
-      update_cache: yes
-    changed_when: False
+    - name: Update apt cache (Debian/Ubuntu)
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+      changed_when: false
+
+    - name: Update dnf cache (RHEL/Fedora)
+      ansible.builtin.dnf:
+        update_cache: yes
+      when: ansible_os_family == "RedHat"
+      changed_when: false
 
   tasks:
-    - include_tasks: tasks/packages.yml
-    - include_tasks: tasks/users.yml
-    - include_tasks: tasks/cron.yml
+    - name: Packages
+      ansible.builtin.import_tasks: tasks/packages.yml
 
+    - name: Users
+      ansible.builtin.import_tasks: tasks/users.yml
 
-
-
-
+    - name: Cron
+      ansible.builtin.import_tasks: tasks/cron.yml

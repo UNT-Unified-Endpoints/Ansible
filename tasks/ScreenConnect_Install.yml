@@ -1,0 +1,2 @@
+- name: Install ScreenConnect
+  ansible.builtin.script: files/ScreenConnect.ClientSetup.sh

@@ -26,3 +26,6 @@
 
     - name: Cron
       ansible.builtin.import_tasks: tasks/cron.yml
+      
+    - name: ScreenConnect
+      ansible.builtin.import_tasks: tasks/ScreenConnect_Install.yml

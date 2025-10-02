@@ -1,8 +1,7 @@
 - name: Install packages
-  apt:
+  package:
     name:
       - cmatrix
-      - neofetch
       - ranger
       - nmap
     state: present

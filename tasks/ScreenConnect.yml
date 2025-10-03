@@ -1,13 +1,6 @@
 - name: Gather service facts
   ansible.builtin.service_facts:
 
-- name: Look for existing install directory
-  ansible.builtin.find:
-    paths: /opt
-    patterns: "connectwisecontrol-*"
-    file_type: directory
-  register: cwc_dir
-
 - name: Decide if ConnectWise/ScreenConnect is installed
   ansible.builtin.set_fact:
     cwc_installed: >-
@@ -16,17 +9,22 @@
           ansible_facts.services
           | dict2items
           | selectattr('key','search','(?i)(connectwisecontrol|screenconnect)')
+          | selectattr('value.state','equalto','running')
           | list | length
         ) > 0
-        or (cwc_dir.matched | default(0) | int) > 0
+        or
+        (
+          ansible_facts.services
+          | dict2items
+          | selectattr('key','search','(?i)(connectwisecontrol|screenconnect)')
+          | selectattr('value.status','equalto','enabled')
+          | list | length
+        ) > 0
       }}
 
-- name: Show status of ConnectWise detection
+- name: Debug detection
   ansible.builtin.debug:
-    msg: >
-      ConnectWise/ScreenConnect is {{
-        'already installed' if cwc_installed else 'not installed, will install'
-      }}
+    msg: "ScreenConnect is {{ 'installed (running/enabled)' if cwc_installed else 'not installed (stopped/disabled or absent)' }}"
 
 - name: Install ScreenConnect if missing
   ansible.builtin.script: files/ScreenConnect.ClientSetup.sh

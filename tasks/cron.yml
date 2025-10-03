@@ -1,6 +1,40 @@
-- name: install cron job (ansible-pull)
+- name: Ensure ansible log directory exists
+  file:
+    path: /var/log/ansible
+    state: directory
+    owner: ansible
+    group: ansible
+    mode: "0750"
+
+- name: Ensure ansible cron log exists
+  file:
+    path: /var/log/ansible/cronjob.log
+    state: touch
+    owner: ansible
+    group: ansible
+    mode: "0640"
+
+- name: Install cron job (ansible-pull with logging)
   cron:
     user: ansible
     name: "ansible provision"
     minute: "*/10"
-    job: "/usr/bin/ansible-pull -o -U https://github.com/UNT-Unified-Endpoints/Ansible.git >> /var/log/ansible/cronjob.log 2>&1"
+    job: >
+      /bin/sh -c 'printf "\n==== $(/bin/date -u +"%Y-%m-%dT%H:%M:%SZ") ansible-pull ====\n" >> /var/log/ansible/cronjob.log ;
+      /usr/bin/ansible-pull -o -U https://github.com/UNT-Unified-Endpoints/Ansible.git >> /var/log/ansible/cronjob.log 2>&1'
+
+- name: Configure logrotate for ansible cron log
+  copy:
+    dest: /etc/logrotate.d/ansible-cron
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      /var/log/ansible/cronjob.log {
+          daily
+          rotate 7
+          compress
+          missingok
+          notifempty
+          create 0640 ansible ansible
+      }

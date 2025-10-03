@@ -1,7 +1,7 @@
-- name: Gather service facts
+- name: Gather system service facts
   ansible.builtin.service_facts:
 
-- name: Decide if ConnectWise/ScreenConnect is installed
+- name: Determine if ConnectWise/ScreenConnect is installed
   ansible.builtin.set_fact:
     cwc_installed: >-
       {{
@@ -22,10 +22,6 @@
         ) > 0
       }}
 
-- name: Debug detection
-  ansible.builtin.debug:
-    msg: "ScreenConnect is {{ 'installed (running/enabled)' if cwc_installed else 'not installed (stopped/disabled or absent)' }}"
-
-- name: Install ScreenConnect if missing
+- name: Install ScreenConnect client if not installed
   ansible.builtin.script: files/ScreenConnect.ClientSetup.sh
   when: not cwc_installed
